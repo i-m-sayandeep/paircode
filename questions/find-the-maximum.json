@@ -1,0 +1,14 @@
+{
+  "id": "find-the-maximum",
+  "title": "Find the Maximum",
+  "difficulty": "Medium",
+  "topic": "Arrays",
+  "shortDescription": "Find the biggest number without losing your cool.",
+  "description": "Given an array of numbers, return the largest value in the array.",
+  "body": "Write a function that finds and returns the largest number from a non-empty array of numbers.\n\nYour solution should work for both positive and negative values.",
+  "notes": [
+    "The array will contain at least one number.",
+    "The input values will be valid numbers."
+  ],
+  "starterCode": "function solution(input) {\n  // Return the largest number in the array\n  \n}\n\n// Try it with the test cases on the right"
+}

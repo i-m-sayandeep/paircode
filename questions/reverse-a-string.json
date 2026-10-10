@@ -1,0 +1,14 @@
+{
+  "id": "reverse-a-string",
+  "title": "Reverse a String",
+  "difficulty": "Easy",
+  "topic": "Strings",
+  "shortDescription": "Turn a string around, one character at a time.",
+  "description": "Given a string, return a new string with its characters in reverse order.",
+  "body": "Create a function that takes one string and returns the same characters in reverse order.\n\nDo not modify the original input.",
+  "notes": [
+    "The input will always be a string.",
+    "An empty string should return an empty string."
+  ],
+  "starterCode": "function solution(input) {\n  // Return the input string in reverse\n  \n}\n\n// Try it with the test cases on the right"
+}

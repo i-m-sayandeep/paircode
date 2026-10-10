@@ -1,0 +1,14 @@
+{
+  "id": "sum-two-numbers",
+  "title": "Sum Two Numbers",
+  "difficulty": "Easy",
+  "topic": "Warm-up",
+  "shortDescription": "A little warm-up to get your coding session started.",
+  "description": "Given an array of two numbers, return their sum.",
+  "body": "Write a function that takes an array containing two numbers and returns their sum.\n\nYour function will receive the input as a single argument, and should return a number.",
+  "notes": [
+    "The input will always contain exactly two numbers.",
+    "Numbers may be negative or decimals."
+  ],
+  "starterCode": "function solution(input) {\n  // Write your solution here\n  \n}\n\n// Try it with the test cases on the right"
+}

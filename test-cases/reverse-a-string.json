@@ -1,0 +1,5 @@
+[
+  { "input": "hello", "expected": "olleh" },
+  { "input": "paircode", "expected": "edocriap" },
+  { "input": "", "expected": "" }
+]
