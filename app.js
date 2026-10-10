@@ -1,12 +1,32 @@
 const STORAGE_KEY = "paircode-challenges-v1";
 const SUBMISSIONS_STORAGE_KEY = "paircode-submissions-v1";
 const LOGIN_SESSION_KEY = "paircode-demo-login";
+const WANDBOX_API_URL = "https://wandbox.org/api/compile.json";
+const LANGUAGE_OPTIONS = {
+  javascript: { label: "JavaScript", extension: "js", badge: "JS" },
+  c: { label: "C", extension: "c", badge: "C" },
+  cpp: { label: "C++", extension: "cpp", badge: "C++" },
+};
 const STARTER_CODE = `function solution(input) {
   // Write your solution here
   
 }
 
 // Try it with the test cases on the right`;
+const COMPILED_STARTER_CODE = {
+  c: `#include <stdio.h>
+
+int main(void) {
+  // Read the test input from stdin and print your answer.
+  return 0;
+}`,
+  cpp: `#include <iostream>
+
+int main() {
+  // Read the test input from std::cin and print your answer.
+  return 0;
+}`,
+};
 
 const starterChallenges = [
   {
@@ -83,6 +103,11 @@ const elements = {
   examples: document.querySelector("#examples-list"),
   notes: document.querySelector("#notes-list"),
   code: document.querySelector("#code-editor"),
+  language: document.querySelector("#language-select"),
+  languageBadge: document.querySelector("#language-badge"),
+  editorFilename: document.querySelector("#editor-filename"),
+  editorLanguageStatus: document.querySelector("#editor-language-status"),
+  compilerNotice: document.querySelector("#compiler-notice"),
   lineNumbers: document.querySelector("#line-numbers"),
   results: document.querySelector("#results-content"),
   caseCount: document.querySelector("#case-count"),
@@ -121,6 +146,7 @@ if (sharedChallenge) {
   challenges.push(sharedChallenge);
 }
 let activeChallengeId = sharedChallenge?.id || challenges[0].id;
+let activeLanguage = "javascript";
 let toastTimer;
 
 function showApp() {
@@ -231,6 +257,7 @@ async function loadPublishedQuestions() {
       ...published.map((challenge) => ({
         ...challenge,
         code: savedById.get(challenge.id)?.code || challenge.starterCode,
+        codes: savedById.get(challenge.id)?.codes || {},
       })),
       ...challenges.filter((challenge) => !publishedIds.has(challenge.id)),
     ];
@@ -347,7 +374,10 @@ function challengeProgress(challenge) {
   if (solvedChallenge(challenge)) return { label: "Solved", className: "solved" };
   if (latestSubmission(challenge.id)) return { label: "Attempted", className: "attempted" };
   const starterCode = starterChallenges.find((starter) => starter.id === challenge.id)?.code || STARTER_CODE;
-  if (challenge.code && challenge.code !== starterCode) return { label: "In progress", className: "in-progress" };
+  if (
+    (challenge.code && challenge.code !== starterCode) ||
+    Object.entries(challenge.codes || {}).some(([language, code]) => code && code !== COMPILED_STARTER_CODE[language])
+  ) return { label: "In progress", className: "in-progress" };
   return { label: "Not started", className: "not-started" };
 }
 
@@ -405,12 +435,38 @@ function renderChallenge() {
     item.textContent = note;
     elements.notes.append(item);
   });
-  elements.code.value = challenge.code || STARTER_CODE;
+  const language = elements.language.value;
+  elements.code.value = getChallengeCode(challenge, language);
+  updateLanguageUi();
   updateLineNumbers();
   updateCursorPosition();
   updateTestCount();
   clearResults();
   renderChallengeList();
+}
+
+function getChallengeCode(challenge, language) {
+  if (language === "javascript") return challenge.code || STARTER_CODE;
+  challenge.codes ||= {};
+  return challenge.codes[language] || COMPILED_STARTER_CODE[language];
+}
+
+function saveCurrentCode(challenge, language, code) {
+  if (language === "javascript") {
+    challenge.code = code;
+    return;
+  }
+  challenge.codes ||= {};
+  challenge.codes[language] = code;
+}
+
+function updateLanguageUi() {
+  const language = LANGUAGE_OPTIONS[elements.language.value];
+  elements.languageBadge.textContent = language.badge;
+  elements.editorFilename.textContent = `solution.${language.extension}`;
+  elements.editorLanguageStatus.innerHTML = `<span class="status-dot"></span> ${language.label}`;
+  elements.code.setAttribute("aria-label", `${language.label} code editor`);
+  elements.compilerNotice.hidden = elements.language.value === "javascript";
 }
 
 function exampleLine(label, value) {
@@ -427,7 +483,7 @@ function exampleLine(label, value) {
 
 function selectChallenge(id) {
   const current = activeChallenge();
-  if (current) current.code = elements.code.value;
+  if (current) saveCurrentCode(current, elements.language.value, elements.code.value);
   activeChallengeId = id;
   renderChallenge();
   saveChallenges();
@@ -528,6 +584,7 @@ function executeTest(code, input) {
 
 async function runTests() {
   const code = elements.code.value.trim();
+  const language = elements.language.value;
   if (!code) {
     showToast("Write a solution before running the tests.");
     return null;
@@ -538,7 +595,9 @@ async function runTests() {
   try {
     const outcomes = [];
     for (const [index, test] of activeChallenge().tests.entries()) {
-      const result = await executeTest(code, test.input);
+      const result = language === "javascript"
+        ? await executeTest(code, test.input)
+        : await executeCompiledTest(code, language, test.input);
       outcomes.push({
         index: index + 1,
         input: test.input,
@@ -550,14 +609,79 @@ async function runTests() {
     }
     const duration = Math.max(1, Math.round(performance.now() - startedAt));
     renderResults(outcomes, duration);
-    return { outcomes, duration };
+    return { outcomes, duration, language };
   } catch (error) {
     console.error("Could not finish running test cases:", error);
-    showToast("Could not finish running the tests. Please try again.");
+    showToast(error.message || "Could not finish running the tests. Please try again.");
     return null;
   } finally {
     elements.runButton.disabled = false;
     elements.runButton.innerHTML = '<span class="play-icon">▶</span> Run tests <kbd>⌘ ↵</kbd>';
+  }
+}
+
+function serializeCompilerInput(input) {
+  if (Array.isArray(input) && input.every((value) => ["string", "number", "boolean"].includes(typeof value))) {
+    return input.map(String).join(" ");
+  }
+  if (typeof input === "string") return input;
+  if (input === null || ["number", "boolean"].includes(typeof input)) return String(input);
+  return JSON.stringify(input);
+}
+
+function parseCompilerOutput(output) {
+  const trimmed = output.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return trimmed;
+  }
+}
+
+async function executeCompiledTest(code, language, input) {
+  const compiler = language === "c" ? "gcc-13.2.0-c" : "gcc-13.2.0";
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20_000);
+  try {
+    const response = await fetch(WANDBOX_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        compiler,
+        code,
+        stdin: serializeCompilerInput(input),
+        save: false,
+      }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Wandbox returned HTTP ${response.status}.`);
+    }
+    const result = await response.json();
+    if (result.compiler_error || (result.status !== "0" && result.compiler_message)) {
+      return { error: result.compiler_error || result.compiler_message };
+    }
+    if (result.program_error || result.signal) {
+      return {
+        error: [result.program_error, result.signal && `Program terminated with signal ${result.signal}.`]
+          .filter(Boolean)
+          .join("\n"),
+      };
+    }
+    if (result.status !== "0") {
+      return { error: `Program exited with status ${result.status || "unknown"}.` };
+    }
+    if (typeof result.program_output !== "string") {
+      throw new Error("Wandbox returned an invalid compiler result.");
+    }
+    return { value: parseCompilerOutput(result.program_output) };
+  } catch (error) {
+    if (error.name === "AbortError") {
+      return { error: "Compilation or execution timed out after 20 seconds." };
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -580,6 +704,7 @@ async function submitSolution() {
       challengeId: challenge.id,
       challengeTitle: challenge.title,
       code,
+      language: run.language,
       submittedAt: new Date().toISOString(),
       duration: run.duration,
       passedCount,
@@ -736,7 +861,8 @@ function renderSubmissions() {
     header.append(title, headerActions);
     const metadata = document.createElement("p");
     const submittedAt = new Date(submission.submittedAt);
-    metadata.textContent = `${Number.isNaN(submittedAt.getTime()) ? "Date unavailable" : submittedAt.toLocaleString()} · ${submission.duration} ms`;
+    const language = LANGUAGE_OPTIONS[submission.language]?.label || "JavaScript";
+    metadata.textContent = `${language} · ${Number.isNaN(submittedAt.getTime()) ? "Date unavailable" : submittedAt.toLocaleString()} · ${submission.duration} ms`;
     const details = document.createElement("details");
     details.className = "submission-details";
     const summary = document.createElement("summary");
@@ -883,7 +1009,18 @@ elements.code.addEventListener("input", () => {
   updateCursorPosition();
   document.querySelector("#unsaved-dot").classList.add("visible");
   const challenge = activeChallenge();
-  if (challenge) challenge.code = elements.code.value;
+  if (challenge) saveCurrentCode(challenge, elements.language.value, elements.code.value);
+  saveChallenges();
+});
+elements.language.addEventListener("change", () => {
+  const challenge = activeChallenge();
+  if (challenge) saveCurrentCode(challenge, activeLanguage, elements.code.value);
+  activeLanguage = elements.language.value;
+  if (challenge) elements.code.value = getChallengeCode(challenge, activeLanguage);
+  updateLanguageUi();
+  updateLineNumbers();
+  updateCursorPosition();
+  clearResults();
   saveChallenges();
 });
 elements.code.addEventListener("scroll", () => { elements.lineNumbers.scrollTop = elements.code.scrollTop; });
@@ -910,7 +1047,11 @@ elements.submissionsButton.addEventListener("click", () => {
 });
 document.querySelector("#reset-button").addEventListener("click", () => {
   const challenge = activeChallenge();
-  elements.code.value = starterChallenges.find((starter) => starter.id === challenge.id)?.code || STARTER_CODE;
+  const language = elements.language.value;
+  const starter = language === "javascript"
+    ? starterChallenges.find((item) => item.id === challenge.id)?.code || STARTER_CODE
+    : COMPILED_STARTER_CODE[language];
+  elements.code.value = starter;
   elements.code.dispatchEvent(new Event("input"));
   showToast("Starter code restored.");
 });
@@ -940,7 +1081,9 @@ document.querySelector("#invite-button").addEventListener("click", async () => {
   }
 });
 document.querySelector("#help-button").addEventListener("click", () => {
-  showToast("Write a JavaScript function named solution(input), then run the test cases.");
+  showToast(elements.language.value === "javascript"
+    ? "Write a JavaScript function named solution(input), then run the test cases."
+    : "Read each test case from standard input and print your answer to standard output.");
 });
 document.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {

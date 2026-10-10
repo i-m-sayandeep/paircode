@@ -146,7 +146,7 @@
 
           <section class="editor-panel" aria-label="Code editor and test results">
             <div class="editor-topbar">
-              <div class="file-tab"><span class="js-badge">JS</span><span>solution.js</span><span class="unsaved-dot" id="unsaved-dot"></span></div>
+              <div class="file-tab"><span class="js-badge" id="language-badge">JS</span><span id="editor-filename">solution.js</span><span class="unsaved-dot" id="unsaved-dot"></span></div>
               <div class="editor-tools">
                 <button class="editor-tool" id="reset-button" title="Reset code to starter">↺ <span>Reset</span></button>
                 <span class="tool-divider"></span>
@@ -154,6 +154,8 @@
                   <span class="sr-only">Programming language</span>
                   <select id="language-select" aria-label="Programming language">
                     <option value="javascript">JavaScript</option>
+                    <option value="c">C</option>
+                    <option value="cpp">C++</option>
                   </select>
                   <span class="select-caret">⌄</span>
                 </label>
@@ -164,7 +166,7 @@
               <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="JavaScript code editor"></textarea>
             </div>
             <div class="editor-statusbar">
-              <span><span class="status-dot"></span> JavaScript</span>
+              <span id="editor-language-status"><span class="status-dot"></span> JavaScript</span>
               <span>UTF-8</span>
               <span>Spaces: 2</span>
               <span class="editor-status-right">Ln <b id="cursor-line">1</b>, Col <b id="cursor-column">1</b></span>
@@ -176,6 +178,10 @@
                   <button class="run-button" id="run-button"><span class="play-icon">▶</span> Run tests <kbd>⌘ ↵</kbd></button>
                   <button class="submit-button" id="submit-button"><span>✓</span> Submit solution</button>
                 </div>
+              </div>
+              <div class="compiler-notice" id="compiler-notice" hidden>
+                C/C++ runs on <a href="https://wandbox.org/" target="_blank" rel="noopener noreferrer">Wandbox</a>.
+                Your source code and test inputs are sent to their public compiler service. Avoid submitting sensitive code.
               </div>
               <div class="results-content" id="results-content">
                 <div class="empty-results">

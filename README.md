@@ -30,8 +30,29 @@ these files or in the public repository.
 
 ## C and C++ execution
 
-JavaScript runs in an isolated browser worker. C and C++ need a separate compiler
-service or an in-browser WebAssembly toolchain; the GitHub Pages site does not
-include either. Do not place a private compiler-service API key in client-side
-code. An API integration needs an explicitly configured endpoint with suitable
-CORS and access controls.
+The editor runs JavaScript in a browser worker. C and C++ are compiled and run
+by the public [Wandbox](https://wandbox.org/) compiler API, so no API key is
+needed. Every C/C++ run sends the participant's source code and each test
+input to Wandbox. Do not submit sensitive code. Wandbox is a shared public
+service and may apply rate limits or be unavailable; it is not a guaranteed
+production backend.
+
+For C/C++ test cases, flat arrays are sent as whitespace-separated values
+(`[2, 7]` becomes `2 7`), strings are sent as-is, and other values are sent
+as JSON. Read each case from standard input and print the expected result to
+standard output. Output that is valid JSON is compared as a JSON value;
+otherwise, trimmed output is compared as text. Each test case is compiled and
+run separately.
+
+For example, the `Sum Two Numbers` challenge can be solved in C++ with:
+
+```cpp
+#include <iostream>
+
+int main() {
+  double first, second;
+  if (!(std::cin >> first >> second)) return 1;
+  std::cout << first + second;
+  return 0;
+}
+```
