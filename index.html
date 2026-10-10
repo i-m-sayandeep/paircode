@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f6f7fb" />
+    <meta name="theme-color" content="#101116" />
     <title>Paircode — Coding challenges, together</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body data-theme="dark">
     <section class="login-screen" id="login-screen" aria-labelledby="login-title">
       <div class="login-card">
         <a class="brand login-brand" href="#" aria-label="Paircode home">
@@ -21,6 +21,13 @@
           <span class="eyebrow"><span class="live-dot"></span> YOUR CODING WORKSPACE</span>
           <h1 id="login-title">Welcome back<span class="brand-period">.</span></h1>
           <p>Sign in to open your challenges and get coding.</p>
+        </div>
+        <div class="login-code-window" aria-label="Coding workspace preview">
+          <div class="login-code-top"><span><i></i><i></i><i></i></span><code>solution.js</code><span>JS</span></div>
+          <pre><span class="code-purple">function</span> <span class="code-yellow">solution</span>(input) {
+  <span class="code-purple">return</span> input.<span class="code-yellow">map</span>(item =&gt; item);
+}</pre>
+          <div class="login-code-status"><span>✓</span> Ready to run <span class="code-status-right">JavaScript</span></div>
         </div>
         <form class="login-form" id="login-form">
           <label class="login-field">
@@ -40,10 +47,18 @@
       <div class="login-decoration" aria-hidden="true">
         <div class="decoration-orbit orbit-one"></div>
         <div class="decoration-orbit orbit-two"></div>
-        <div class="decoration-card"><span class="decoration-dot"></span><code>function solution(input) {</code><code class="decoration-indent">return input.reduce(sum);</code><code>}</code><span class="decoration-check">✓ all tests passed</span></div>
-        <span class="decoration-spark spark-one">✳</span>
-        <span class="decoration-spark spark-two">✦</span>
+        <div class="decoration-card">
+          <div class="decoration-card-top"><span class="decoration-dot"></span><span>challenge-01.js</span><span>•••</span></div>
+          <code><span class="code-purple">const</span> tests = [</code>
+          <code class="decoration-indent">{ input: [2, 7], expected: 9 },</code>
+          <code class="decoration-indent">{ input: [-3, 5], expected: 2 },</code>
+          <code>];</code>
+          <span class="decoration-check">✓  All 3 tests passed <span>42 ms</span></span>
+        </div>
+        <span class="decoration-spark spark-one">⌘</span>
+        <span class="decoration-spark spark-two">✳</span>
       </div>
+      <button class="theme-toggle login-theme-toggle" type="button" aria-label="Switch to light theme"><span class="theme-toggle-icon">☼</span><span class="theme-toggle-label">Light theme</span></button>
     </section>
 
     <div class="app-shell" id="app-shell" hidden>
@@ -175,7 +190,7 @@
             </div>
           </section>
         </div>
-        <footer class="site-footer">© 2026 Sayandeep Maity. All rights reserved.</footer>
+        <footer class="site-footer"><span>© 2026 Sayandeep Maity. All rights reserved.</span><button class="theme-toggle" type="button" aria-label="Switch to light theme"><span class="theme-toggle-icon">☼</span><span class="theme-toggle-label">Light theme</span></button></footer>
       </main>
     </div>
 
@@ -230,6 +245,7 @@
       <div class="submission-list" id="submission-list"></div>
       <p class="local-data-note">Submissions are saved in this browser only.</p>
     </dialog>
+    <script src="theme.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

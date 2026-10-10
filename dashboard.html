@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101116" />
+    <title>Paircode — Your workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dashboard-page" data-theme="dark">
+    <div class="dashboard-shell">
+      <aside class="dashboard-sidebar">
+        <a class="brand" href="./dashboard.html" aria-label="Paircode home">
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span>paircode<span class="brand-period">.</span></span>
+        </a>
+        <span class="dashboard-section-label">WORKSPACE</span>
+        <a class="dashboard-nav-link active" href="./dashboard.html"><span>▦</span> Dashboard</a>
+        <a class="dashboard-nav-link" href="./index.html"><span>⌘</span> Challenges</a>
+        <div class="dashboard-sidebar-bottom">
+          <div class="dashboard-profile-avatar">S</div>
+          <div class="dashboard-profile-copy"><strong>Suchetana</strong><span>Participant</span></div>
+          <button class="dashboard-signout" id="signout-button" type="button" aria-label="Sign out" title="Sign out">↗</button>
+        </div>
+      </aside>
+      <main class="dashboard-main">
+        <header class="dashboard-topbar">
+          <div class="dashboard-breadcrumb"><span>Workspace</span><span>/</span><strong>Dashboard</strong></div>
+          <div class="dashboard-top-actions">
+            <a class="dashboard-challenges-link" href="./index.html">Open challenges <span>↗</span></a>
+            <div class="dashboard-user-chip"><span class="dashboard-user-dot"></span> Suchetana</div>
+          </div>
+        </header>
+        <div class="dashboard-content">
+          <section class="dashboard-welcome">
+            <div>
+              <span class="dashboard-eyebrow"><span class="live-dot"></span> YOUR CODING WORKSPACE</span>
+              <h1>Good to see you, <span>Suchetana.</span></h1>
+              <p>Pick up where you left off, or take on something new.</p>
+            </div>
+            <a class="dashboard-primary-link" href="./index.html">Browse challenges <span>→</span></a>
+          </section>
+          <section class="dashboard-stat-grid" aria-label="Your statistics">
+            <article class="dashboard-stat-card stat-purple"><span class="stat-card-icon">✓</span><span class="stat-card-label">CHALLENGES SOLVED</span><strong id="dash-solved">0</strong><small id="dash-solved-caption">Keep going — your next solve is waiting.</small></article>
+            <article class="dashboard-stat-card stat-blue"><span class="stat-card-icon">⌁</span><span class="stat-card-label">TOTAL CHALLENGES</span><strong id="dash-total">0</strong><small>Ready when you are</small></article>
+            <article class="dashboard-stat-card stat-green"><span class="stat-card-icon">▤</span><span class="stat-card-label">SUBMISSIONS</span><strong id="dash-submissions">0</strong><small>Your attempts, saved on this device</small></article>
+          </section>
+          <section class="dashboard-section">
+            <div class="dashboard-section-heading"><div><span class="dashboard-eyebrow">KEEP YOUR MOMENTUM</span><h2>Your challenges</h2></div><a href="./index.html">View all <span>→</span></a></div>
+            <div class="dashboard-challenge-grid" id="dashboard-challenges"><div class="dashboard-loading">Loading your challenges…</div></div>
+          </section>
+          <section class="dashboard-latest">
+            <div class="dashboard-section-heading"><div><span class="dashboard-eyebrow">YOUR LATEST WORK</span><h2>Recent submissions</h2></div><a href="./index.html?view=submissions">Submission history <span>→</span></a></div>
+            <div class="dashboard-recent-list" id="dashboard-recent"></div>
+          </section>
+        </div>
+        <footer class="dashboard-footer">
+          <span>© 2026 Sayandeep Maity. All rights reserved.</span>
+          <button class="theme-toggle" type="button" aria-label="Switch to light theme"><span class="theme-toggle-icon">☼</span><span class="theme-toggle-label">Light theme</span></button>
+        </footer>
+      </main>
+    </div>
+    <script src="theme.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

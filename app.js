@@ -129,7 +129,14 @@ function showApp() {
 }
 
 try {
-  if (sessionStorage.getItem(LOGIN_SESSION_KEY) === "1") showApp();
+  if (sessionStorage.getItem(LOGIN_SESSION_KEY) === "1") {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("challenge") && !params.has("question") && params.get("view") !== "submissions") {
+      window.location.replace(new URL("dashboard.html", window.location.href));
+    } else {
+      showApp();
+    }
+  }
 } catch (error) {
   console.warn("Could not read the demo login session:", error);
 }
@@ -146,7 +153,7 @@ elements.loginForm.addEventListener("submit", (event) => {
   try {
     sessionStorage.setItem(LOGIN_SESSION_KEY, "1");
     elements.loginError.hidden = true;
-    showApp();
+    window.location.assign(new URL("dashboard.html", window.location.href));
   } catch (error) {
     elements.loginError.textContent = "Could not save this demo session in your browser. Please check your browser storage settings.";
     elements.loginError.hidden = false;
@@ -206,6 +213,7 @@ async function loadPublishedQuestions() {
       return {
         ...question,
         id,
+        published: true,
         difficulty: ["Easy", "Medium", "Hard"].includes(question.difficulty) ? question.difficulty : "Easy",
         topic: typeof question.topic === "string" ? question.topic : "General",
         shortDescription: typeof question.shortDescription === "string" ? question.shortDescription : question.description,
@@ -226,6 +234,8 @@ async function loadPublishedQuestions() {
       })),
       ...challenges.filter((challenge) => !publishedIds.has(challenge.id)),
     ];
+    const requestedQuestion = new URLSearchParams(window.location.search).get("question");
+    if (requestedQuestion && publishedIds.has(requestedQuestion)) activeChallengeId = requestedQuestion;
     if (!challenges.some((challenge) => challenge.id === activeChallengeId)) activeChallengeId = challenges[0].id;
     renderChallenge();
   } catch (error) {
@@ -840,6 +850,10 @@ elements.questionForm.addEventListener("submit", (event) => {
     saveChallenges();
     renderChallenge();
     loadPublishedQuestions();
+    if (new URLSearchParams(window.location.search).get("view") === "submissions") {
+      renderSubmissions();
+      elements.submissionsModal.showModal();
+    }
     elements.questionModal.close();
     showToast("Challenge created. Your question is ready to solve.");
   } catch (error) {

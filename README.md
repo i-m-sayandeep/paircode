@@ -1,6 +1,7 @@
 # Paircode
 
-Paircode is a static JavaScript coding-challenge site for GitHub Pages.
+Paircode is a static JavaScript coding-challenge site for GitHub Pages. The
+login and participant data currently use browser-only demo storage.
 
 ## Add a published question
 
@@ -26,3 +27,11 @@ The current demo login is not authentication. Challenge drafts, code, progress,
 and submissions stay in the current browser unless a submission is manually
 exported and committed. Do not put passwords, access tokens, or other secrets in
 these files or in the public repository.
+
+## C and C++ execution
+
+JavaScript runs in an isolated browser worker. C and C++ need a separate compiler
+service or an in-browser WebAssembly toolchain; the GitHub Pages site does not
+include either. Do not place a private compiler-service API key in client-side
+code. An API integration needs an explicitly configured endpoint with suitable
+CORS and access controls.
