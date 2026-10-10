@@ -105,7 +105,7 @@ async function loadDashboard() {
     const openLink = document.createElement("a");
     openLink.className = "dashboard-card-link";
     openLink.textContent = "Open challenge →";
-    const editorUrl = new URL("index.html", window.location.href);
+    const editorUrl = new URL("editor.html", window.location.href);
     if (challenge.published) {
       editorUrl.searchParams.set("question", challenge.id);
     } else {
@@ -150,7 +150,7 @@ function renderRecentSubmissions(submissions, challenges) {
       `dashboard-recent-result ${submission.allPassed ? "solved" : "attempted"}`,
       submission.allPassed ? "All tests passed" : `${submission.passedCount}/${submission.totalCount} passed`,
     );
-    item.href = new URL("index.html?view=submissions", window.location.href).href;
+    item.href = new URL("editor.html?view=submissions", window.location.href).href;
     item.append(copy, result);
     recentContainer.append(item);
   });

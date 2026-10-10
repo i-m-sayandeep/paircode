@@ -90,10 +90,6 @@ const starterChallenges = [
 ];
 
 const elements = {
-  appShell: document.querySelector("#app-shell"),
-  loginScreen: document.querySelector("#login-screen"),
-  loginForm: document.querySelector("#login-form"),
-  loginError: document.querySelector("#login-error"),
   challengeList: document.querySelector("#challenge-list"),
   challengeCount: document.querySelector("#challenge-count"),
   title: document.querySelector("#problem-title"),
@@ -149,44 +145,13 @@ let activeChallengeId = sharedChallenge?.id || challenges[0].id;
 let activeLanguage = "javascript";
 let toastTimer;
 
-function showApp() {
-  elements.loginScreen.hidden = true;
-  elements.appShell.hidden = false;
-}
-
 try {
-  if (localStorage.getItem(LOGIN_SESSION_KEY) === "1" || sessionStorage.getItem(LOGIN_SESSION_KEY) === "1") {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("challenge") && !params.has("question") && params.get("view") !== "submissions") {
-      window.location.replace(new URL("dashboard.html", window.location.href));
-    } else {
-      showApp();
-    }
+  if (localStorage.getItem(LOGIN_SESSION_KEY) !== "1" && sessionStorage.getItem(LOGIN_SESSION_KEY) !== "1") {
+    window.location.replace(new URL("index.html", window.location.href));
   }
 } catch (error) {
   console.warn("Could not read the demo login session:", error);
 }
-
-elements.loginForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  if (!elements.loginForm.reportValidity()) return;
-  const formData = new FormData(elements.loginForm);
-  if (formData.get("username") !== "suchetana" || formData.get("password") !== "suchetana") {
-    elements.loginError.textContent = "That demo username or password is incorrect.";
-    elements.loginError.hidden = false;
-    return;
-  }
-  try {
-    localStorage.setItem(LOGIN_SESSION_KEY, "1");
-    sessionStorage.setItem(LOGIN_SESSION_KEY, "1");
-    elements.loginError.hidden = true;
-    window.location.assign(new URL("dashboard.html", window.location.href));
-  } catch (error) {
-    elements.loginError.textContent = "Could not save this demo session in your browser. Please check your browser storage settings.";
-    elements.loginError.hidden = false;
-    console.error("Could not save the demo login session:", error);
-  }
-});
 
 function loadChallenges() {
   try {

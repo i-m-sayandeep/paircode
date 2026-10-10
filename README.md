@@ -1,7 +1,9 @@
 # Paircode
 
-Paircode is a static JavaScript coding-challenge site for GitHub Pages. The
-login and participant data currently use browser-only demo storage.
+Paircode is a static coding-challenge site for GitHub Pages. `index.html` is
+the demo login, `dashboard.html` is the participant dashboard, and
+`editor.html` is the coding workspace. Login and participant data currently
+use browser-only demo storage.
 
 ## Add a published question
 
