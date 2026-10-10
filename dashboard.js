@@ -2,7 +2,7 @@ const LOGIN_SESSION_KEY = "paircode-demo-login";
 const CHALLENGES_STORAGE_KEY = "paircode-challenges-v1";
 const SUBMISSIONS_STORAGE_KEY = "paircode-submissions-v1";
 
-if (sessionStorage.getItem(LOGIN_SESSION_KEY) !== "1") {
+if (localStorage.getItem(LOGIN_SESSION_KEY) !== "1" && sessionStorage.getItem(LOGIN_SESSION_KEY) !== "1") {
   window.location.replace(new URL("index.html", window.location.href));
 }
 
@@ -157,6 +157,7 @@ function renderRecentSubmissions(submissions, challenges) {
 }
 
 document.querySelector("#signout-button").addEventListener("click", () => {
+  localStorage.removeItem(LOGIN_SESSION_KEY);
   sessionStorage.removeItem(LOGIN_SESSION_KEY);
   window.location.replace(new URL("index.html", window.location.href));
 });

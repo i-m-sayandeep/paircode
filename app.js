@@ -155,7 +155,7 @@ function showApp() {
 }
 
 try {
-  if (sessionStorage.getItem(LOGIN_SESSION_KEY) === "1") {
+  if (localStorage.getItem(LOGIN_SESSION_KEY) === "1" || sessionStorage.getItem(LOGIN_SESSION_KEY) === "1") {
     const params = new URLSearchParams(window.location.search);
     if (!params.has("challenge") && !params.has("question") && params.get("view") !== "submissions") {
       window.location.replace(new URL("dashboard.html", window.location.href));
@@ -177,6 +177,7 @@ elements.loginForm.addEventListener("submit", (event) => {
     return;
   }
   try {
+    localStorage.setItem(LOGIN_SESSION_KEY, "1");
     sessionStorage.setItem(LOGIN_SESSION_KEY, "1");
     elements.loginError.hidden = true;
     window.location.assign(new URL("dashboard.html", window.location.href));

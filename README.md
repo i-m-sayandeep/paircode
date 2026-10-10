@@ -23,10 +23,11 @@ Move the downloaded JSON file into `submissions/`, then commit and push it from
 VS Code. GitHub Pages is static hosting and cannot accept file writes from the
 browser.
 
-The current demo login is not authentication. Challenge drafts, code, progress,
-and submissions stay in the current browser unless a submission is manually
-exported and committed. Do not put passwords, access tokens, or other secrets in
-these files or in the public repository.
+The current demo login is not authentication. Its browser-only sign-in state
+persists across tabs on the same browser until sign-out. Challenge drafts, code,
+progress, and submissions stay in the current browser unless a submission is
+manually exported and committed. Do not put passwords, access tokens, or other
+secrets in these files or in the public repository.
 
 ## C and C++ execution
 
