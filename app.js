@@ -105,6 +105,7 @@ const elements = {
   editorLanguageStatus: document.querySelector("#editor-language-status"),
   compilerNotice: document.querySelector("#compiler-notice"),
   lineNumbers: document.querySelector("#line-numbers"),
+  syntaxHighlight: document.querySelector("#syntax-highlight-content"),
   results: document.querySelector("#results-content"),
   caseCount: document.querySelector("#case-count"),
   resultSummary: document.querySelector("#result-summary"),
@@ -404,6 +405,7 @@ function renderChallenge() {
   const language = elements.language.value;
   elements.code.value = getChallengeCode(challenge, language);
   updateLanguageUi();
+  renderSyntaxHighlight();
   updateLineNumbers();
   updateCursorPosition();
   updateTestCount();
@@ -464,6 +466,51 @@ function updateLineNumbers() {
   const count = elements.code.value.split("\n").length;
   elements.lineNumbers.textContent = Array.from({ length: count }, (_, index) => index + 1).join("\n");
   elements.lineNumbers.scrollTop = elements.code.scrollTop;
+}
+
+function renderSyntaxHighlight() {
+  const language = elements.language.value;
+  const keywords = language === "javascript"
+    ? /\b(?:async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|finally|for|from|function|if|import|in|instanceof|let|new|of|return|static|switch|this|throw|try|typeof|var|void|while|yield)\b/
+    : /\b(?:auto|break|case|catch|char|class|const|continue|default|delete|do|double|else|enum|explicit|extern|false|float|for|friend|if|inline|int|long|namespace|new|nullptr|private|protected|public|register|return|short|signed|sizeof|static|struct|switch|template|this|throw|true|try|typedef|typename|union|unsigned|using|virtual|void|volatile|while|bool|constexpr|override|noexcept|std)\b/;
+  const tokenPattern = /(^[ \t]*#.*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|\b(?:0[xX][\da-fA-F]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\b|[A-Za-z_$][\w$]*|(?:===?|!==?|=>|<=|>=|\+\+|--|&&|\|\||[+\-*\/%=<>!&|^~?:])|\s+/gm;
+  const escapeHtml = (text) => text.replace(/[&<>"]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+  })[character]);
+  const highlighted = elements.code.value.replace(tokenPattern, (token, directive, quoted, comment, offset) => {
+    if (directive) return `<span class="syntax-preprocessor">${escapeHtml(token)}</span>`;
+    if (quoted) return `<span class="syntax-string">${escapeHtml(token)}</span>`;
+    if (comment) return `<span class="syntax-comment">${escapeHtml(token)}</span>`;
+    if (/^(?:0[xX][\da-fA-F]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)$/.test(token)) {
+      return `<span class="syntax-number">${escapeHtml(token)}</span>`;
+    }
+    if (/^[A-Za-z_$]/.test(token)) {
+      if (keywords.test(token)) return `<span class="syntax-keyword">${escapeHtml(token)}</span>`;
+      if (/^(?:true|false|null|undefined|NaN|Infinity|NULL|EOF)$/.test(token)) {
+        return `<span class="syntax-constant">${escapeHtml(token)}</span>`;
+      }
+      if (/^[A-Z][A-Z\d_]*$/.test(token)) return `<span class="syntax-constant">${escapeHtml(token)}</span>`;
+      if (/^\s*\(/.test(elements.code.value.slice(offset + token.length))) {
+        return `<span class="syntax-function">${escapeHtml(token)}</span>`;
+      }
+    }
+    if (/^(?:===?|!==?|=>|<=|>=|\+\+|--|&&|\|\||[+\-*\/%=<>!&|^~?:])$/.test(token)) {
+      return `<span class="syntax-operator">${escapeHtml(token)}</span>`;
+    }
+    return escapeHtml(token);
+  });
+  elements.syntaxHighlight.innerHTML = highlighted;
+  syncEditorScroll();
+}
+
+function syncEditorScroll() {
+  elements.lineNumbers.scrollTop = elements.code.scrollTop;
+  elements.syntaxHighlight.parentElement.scrollTop = elements.code.scrollTop;
+  elements.syntaxHighlight.parentElement.scrollLeft = elements.code.scrollLeft;
+  elements.syntaxHighlight.style.transform = `translate(${-elements.code.scrollLeft}px, ${-elements.code.scrollTop}px)`;
 }
 
 function updateCursorPosition() {
@@ -971,6 +1018,7 @@ elements.caseForm.addEventListener("submit", (event) => {
 });
 
 elements.code.addEventListener("input", () => {
+  renderSyntaxHighlight();
   updateLineNumbers();
   updateCursorPosition();
   document.querySelector("#unsaved-dot").classList.add("visible");
@@ -984,12 +1032,13 @@ elements.language.addEventListener("change", () => {
   activeLanguage = elements.language.value;
   if (challenge) elements.code.value = getChallengeCode(challenge, activeLanguage);
   updateLanguageUi();
+  renderSyntaxHighlight();
   updateLineNumbers();
   updateCursorPosition();
   clearResults();
   saveChallenges();
 });
-elements.code.addEventListener("scroll", () => { elements.lineNumbers.scrollTop = elements.code.scrollTop; });
+elements.code.addEventListener("scroll", syncEditorScroll);
 elements.code.addEventListener("click", updateCursorPosition);
 elements.code.addEventListener("keyup", updateCursorPosition);
 elements.code.addEventListener("keydown", (event) => {

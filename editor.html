@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body data-theme="dark">
     <div class="app-shell" id="app-shell">
@@ -113,7 +113,10 @@
             </div>
             <div class="editor-workspace">
               <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
-              <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="JavaScript code editor"></textarea>
+              <div class="code-input-wrap">
+                <pre class="syntax-highlight" aria-hidden="true"><code id="syntax-highlight-content"></code></pre>
+                <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="JavaScript code editor"></textarea>
+              </div>
             </div>
             <div class="editor-statusbar">
               <span id="editor-language-status"><span class="status-dot"></span> JavaScript</span>
@@ -202,6 +205,6 @@
       <p class="local-data-note">Submissions are saved in this browser only.</p>
     </dialog>
     <script src="theme.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>
